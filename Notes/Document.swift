@@ -8,7 +8,43 @@
 
 import Cocoa
 
+/// Names of files/directories in the package
+enum NoteDocumentFileNames : String {
+	case TextFile = "Text.rtf"
+	
+	case AttachmentsDirectory = "Attachments"
+
+}
+
+enum ErrorCode : Int {
+	/// We couldn't find the document at all
+	case CannotAccessDocument
+	
+	/// We couldn't access any file wrappers inside this document.
+	case CannotLoadFileWrappers
+	
+	/// We couldn't access the Attachment folder.
+	case CannotAccessAttachments
+	
+	/// We couldn't save the Text.rtf file.
+	case CannotSaveText
+	
+	/// We couldn't save an attachment.
+	case CannotSaveAttachment
+	
+}
+
+let ErrorDomain = "NotesErrorDomain"
+func err(_ code: ErrorCode, _ userInfo : [NSObject:AnyObject]? = nil) -> NSError {
+	// Generate an NSError object, using ErrorDomain and whatever
+	// value we were passed.
+	return NSError(domain: ErrorDomain, code: code.rawValue, userInfo: userInfo)
+}
+
 class Document: NSDocument {
+	
+	// Main text content
+	var text : NSAttributedString = NSAttributedString()
 
 	override init() {
 	    super.init()
