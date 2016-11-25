@@ -31,6 +31,36 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2lJ-r3-bnm">
+                        <rect key="frame" x="20" y="20" width="467" height="373"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <clipView key="contentView" ambiguous="YES" id="apT-0n-zNG">
+                            <rect key="frame" x="1" y="1" width="465" height="371"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView ambiguous="YES" importsGraphics="NO" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" linkDetection="YES" dashSubstitution="YES" spellingCorrection="YES" grammarChecking="YES" smartInsertDelete="YES" id="ego-J7-mD6">
+                                    <rect key="frame" x="0.0" y="0.0" width="465" height="371"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <size key="minSize" width="465" height="371"/>
+                                    <size key="maxSize" width="465" height="10000000"/>
+                                    <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <connections>
+                                        <binding destination="-2" name="attributedString" keyPath="self.text" id="v0y-MK-85c"/>
+                                    </connections>
+                                </textView>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="uQ9-w9-YD4">
+                            <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="eYN-Fe-9H9">
+                            <rect key="frame" x="-15" y="1" width="16" height="0.0"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="centerX" secondItem="Hz6-mo-xeY" secondAttribute="centerX" id="OG3-1c-Sd0"/>
@@ -40,6 +70,8 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-x8E"/>
             </connections>
+            <point key="canvasLocation" x="140.5" y="161.5"/>
         </window>
+        <userDefaultsController representsSharedInstance="YES" id="rKP-TT-CeN"/>
     </objects>
 </document>
