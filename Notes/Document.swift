@@ -23,6 +23,9 @@ enum ErrorCode : Int {
 	/// We couldn't access any file wrappers inside this document.
 	case CannotLoadFileWrappers
 	
+	/// We couldn't load the Text.rtf file
+	case CannotLoadText
+	
 	/// We couldn't access the Attachment folder.
 	case CannotAccessAttachments
 	
@@ -91,5 +94,27 @@ class Document: NSDocument {
 		// Return the main document's file wrapper - this is what will 
 		// be saved on disk
 		return self.documentFileWrapper
+	}
+	
+	override func read(from fileWrapper: FileWrapper, ofType typeName: String) throws {
+		// Ensure that we have additional file wrappers in this file wrapper
+		guard let fileWrappers = fileWrapper.fileWrappers else {
+			throw err(.CannotLoadFileWrappers)
+		}
+		
+		// Ensure that we can access the document text
+		guard let documentTextData = fileWrappers[NoteDocumentFileNames.TextFile.rawValue]?.regularFileContents else {
+			throw err(.CannotLoadText)
+		}
+		
+		// Load the text data as RTF
+		guard let documentText = NSAttributedString(rtf: documentTextData,
+		                                            documentAttributes: nil) else {
+			throw err(.CannotLoadText)
+		}
+		
+		// Keep the text in memory
+		self.documentFileWrapper = fileWrapper
+		self.text = documentText
 	}
 }
