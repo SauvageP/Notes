@@ -50,6 +50,8 @@ class Document: NSDocument {
 	    super.init()
 		// Add your subclass-specific initialization here.
 	}
+	
+	var documentFileWrapper = FileWrapper(directoryWithFileWrappers : [:])
 
 	override class func autosavesInPlace() -> Bool {
 		return true
@@ -74,6 +76,20 @@ class Document: NSDocument {
 		throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
 	}
 
-
+	override func fileWrapper(ofType typeName: String) throws -> FileWrapper {
+		let textRTFData = try self.text.data(from: NSRange(0..<self.text.length), documentAttributes: [NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType])
+		
+		// If the current docmuent file wrapper already contains a
+		// text file, remove it - we'll replace it with a new one
+		if let oldTextFileWrapper = self.documentFileWrapper.fileWrappers?[NoteDocumentFileNames.TextFile.rawValue] {
+			self.documentFileWrapper.removeFileWrapper(oldTextFileWrapper)
+		}
+		
+		// Save the text data into the file
+		self.documentFileWrapper.addRegularFile(withContents: textRTFData, preferredFilename: NoteDocumentFileNames.TextFile.rawValue)
+		
+		// Return the main document's file wrapper - this is what will 
+		// be saved on disk
+		return self.documentFileWrapper
+	}
 }
-
