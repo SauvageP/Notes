@@ -117,6 +117,32 @@ extension Document : AddAttachmentDelegate {
 	}
 }
 
+extension Document : NSCollectionViewDataSource {
+	
+	func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
+		
+		// The number of items is equal to the number of
+		// attachments we have. If for some reason we can't
+		// access 'attachmentFiles', we have zero items.
+		return self.attachedFiles?.count ?? 0
+	}
+	func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
+		
+		// Get the attachment that this cell should represent
+		let attachment = self.attachedFiles![indexPath.item]
+		
+		// Get the celll itself
+		let item = collectionView
+		.makeItem(withIdentifier: "AttachmentCell", for: indexPath) as! AttachmentCell
+		
+		// Display the image and file extension in the cell
+		item.imageView?.image = attachment.thumbnailImage
+		item.textField?.stringValue = attachment.fileExtension ?? ""
+		
+		return item
+	}
+}
+
 class Document: NSDocument {
 	
 	// Main text content
@@ -126,6 +152,8 @@ class Document: NSDocument {
 	@IBAction func addAttachment(_ sender: NSButton) {
 		if let viewController = AddAttachmentViewController(nibName:"AddAttachmentViewController", bundle: Bundle.main)
 		{
+			viewController.delegate = self
+			
 			self.popover = NSPopover()
 			
 			self.popover?.behavior = .transient
