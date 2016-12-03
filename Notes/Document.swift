@@ -38,10 +38,42 @@ enum ErrorCode : Int {
 }
 
 let ErrorDomain = "NotesErrorDomain"
+
 func err(_ code: ErrorCode, _ userInfo : [NSObject:AnyObject]? = nil) -> NSError {
 	// Generate an NSError object, using ErrorDomain and whatever
 	// value we were passed.
 	return NSError(domain: ErrorDomain, code: code.rawValue, userInfo: userInfo)
+}
+
+extension FileWrapper {
+	dynamic var fileExtension : String? {
+		return self.preferredFilename?.components(separatedBy: ".").last
+	}
+	dynamic var thumbnailImage : NSImage {
+		if let fileExtension = self.fileExtension {
+			return NSWorkspace.shared().icon(forFileType: fileExtension)
+		} else {
+			return NSWorkspace.shared().icon(forFileType: "")
+		}
+	}
+	func conformsToType(type: CFString) -> Bool {
+		// Get the extension of this file
+		guard let fileExtension = self.fileExtension else {
+			// If we can't get a file extension
+			// assume that it doesn't conform
+			return false
+		}
+		
+		// Get the file type of the attachment based on its extension
+		guard let filetype = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension as CFString, nil)?.takeRetainedValue() else {
+			// If we can't figure out the file type
+			// from the extension, it also doesn't conform
+			return false
+		}
+		
+		// Ask the system if this file type conforms to the provided type
+		return UTTypeConformsTo(filetype, type)
+	}
 }
 
 class Document: NSDocument {
