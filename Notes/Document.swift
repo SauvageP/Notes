@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import MapKit
 
 /// Names of files/directories in the package
 enum NoteDocumentFileNames : String {
@@ -167,11 +168,34 @@ extension Document : AttachmentCellDelegate {
 		self.autosave(withImplicitCancellability: false, completionHandler: {
 			(error) -> Void in
 			
-			var url = self.fileURL
-			url = url?.appendingPathComponent(attachment.preferredFilename!)
+			// If this attachment indicates that it's JSON, and we're
+			// to get JSON data out of it...
+			if attachment.conformsToType(type: kUTTypeJSON),
+				let data = attachment.regularFileContents,
+				let json = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions()) as? NSDictionary {
+				
+				// And if that JSON data includes lat and long entries...
+				
+				if let lat = json?["lat"] as? CLLocationDegrees,
+					let lon = json?["long"] as? CLLocationDegrees {
+					
+					// Build a cooridinate from them
+					let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+					
+					// Build a placemark with that coordinate and a map item in the Maps app!
+					let mapItem = MKMapItem(placemark: MKPlacemark(coordinate: coordinate, addressDictionary: nil))
+					
+					// And open the map item in the Maps app!
+					mapItem.openInMaps(launchOptions: nil)
+				}
+			} else {
 			
-			if let path = url?.path {
-				NSWorkspace.shared().openFile(path, withApplication: nil, andDeactivate: true)
+				var url = self.fileURL
+				url = url?.appendingPathComponent(attachment.preferredFilename!)
+				
+				if let path = url?.path {
+					NSWorkspace.shared().openFile(path, withApplication: nil, andDeactivate: true)
+				}
 			}
 		})
 	}
