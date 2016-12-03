@@ -76,19 +76,114 @@ extension FileWrapper {
 	}
 }
 
+extension Document : AddAttachmentDelegate {
+	func addFile() {
+		let panel = NSOpenPanel()
+		
+		panel.allowsMultipleSelection = false
+		panel.canChooseFiles = true
+		panel.canChooseDirectories = false
+		
+		panel.begin {
+			(result) -> Void in
+			if result == NSModalResponseOK,
+				let resultURL = panel.urls.first {
+				
+				do {
+					
+					// We were given a URL - copy it in!
+					try self.addAttachmentAtURL(url: resultURL as NSURL)
+					
+					// Refresh the attachments list
+					self.attachmentList?.reloadData()
+				} catch let error as NSError {
+					
+					// There was an error adding the attachment,
+					// Show the user!!
+					
+					// Try to get a window in which to present a sheet
+					if let window = self.windowForSheet {
+						
+						// Present the error in a sheet
+						NSApp.presentError(error, modalFor: window, delegate: nil, didPresent: nil, contextInfo: nil)
+					} else {
+						// No window, so present it in a dialog box
+						NSApp.presentError(error)
+					}
+				}
+			}
+		}
+		
+	}
+}
+
 class Document: NSDocument {
 	
 	// Main text content
 	var text : NSAttributedString = NSAttributedString()
+	var documentFileWrapper = FileWrapper(directoryWithFileWrappers : [:])
 
+	@IBAction func addAttachment(_ sender: NSButton) {
+		if let viewController = AddAttachmentViewController(nibName:"AddAttachmentViewController", bundle: Bundle.main)
+		{
+			self.popover = NSPopover()
+			
+			self.popover?.behavior = .transient
+			
+			self.popover?.contentViewController = viewController
+			
+			self.popover?.show(relativeTo: sender.bounds, of: sender, preferredEdge: NSRectEdge.maxY)
+		}
+	}
 	@IBOutlet weak var attachmentList: NSCollectionView!
+	
+	private var attachmentsDirectoryWrapper : FileWrapper? {
+		guard let fileWrappers = self.documentFileWrapper.fileWrappers else {
+			NSLog("Attempting to access document's contents, but none found!")
+			return nil
+		}
+		var attachmentsDirectoryWrapper = fileWrappers[NoteDocumentFileNames.AttachmentsDirectory.rawValue]
+		if attachmentsDirectoryWrapper == nil {
+			attachmentsDirectoryWrapper = FileWrapper(directoryWithFileWrappers: [:])
+			
+			attachmentsDirectoryWrapper?.preferredFilename = NoteDocumentFileNames.AttachmentsDirectory.rawValue
+			
+			self.documentFileWrapper.addFileWrapper(attachmentsDirectoryWrapper!)
+		}
+		return attachmentsDirectoryWrapper
+	}
+	
+	dynamic var attachedFiles : [FileWrapper]? {
+		if let attachmentsFileWrappers = self.attachmentsDirectoryWrapper?.fileWrappers {
+			let attachments = Array(attachmentsFileWrappers.values)
+			
+			return attachments
+		} else {
+			return nil
+		}
+	}
+	
+	var popover : NSPopover?
 	
 	override init() {
 	    super.init()
 		// Add your subclass-specific initialization here.
 	}
 	
-	var documentFileWrapper = FileWrapper(directoryWithFileWrappers : [:])
+	func addAttachmentAtURL(url: NSURL) throws {
+		guard attachmentsDirectoryWrapper != nil else {
+			throw err(.CannotAccessAttachments)
+		}
+		
+		self.willChangeValue(forKey: "attachedFiles")
+		
+		let newAttachment = try FileWrapper(url: url as URL, options: FileWrapper.ReadingOptions.immediate)
+		
+		attachmentsDirectoryWrapper?.addFileWrapper(newAttachment)
+		
+		self.updateChangeCount(.changeDone)
+		self.didChangeValue(forKey: "attachedFiles")
+	}
 
 	override class func autosavesInPlace() -> Bool {
 		return true
