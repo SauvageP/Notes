@@ -49,6 +49,8 @@ class Document: NSDocument {
 	// Main text content
 	var text : NSAttributedString = NSAttributedString()
 
+	@IBOutlet weak var attachmentList: NSCollectionView!
+	
 	override init() {
 	    super.init()
 		// Add your subclass-specific initialization here.
