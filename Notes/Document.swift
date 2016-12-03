@@ -139,7 +139,41 @@ extension Document : NSCollectionViewDataSource {
 		item.imageView?.image = attachment.thumbnailImage
 		item.textField?.stringValue = attachment.fileExtension ?? ""
 		
+		// Make this cell use as it delegate
+		item.delegate = self
+		
 		return item
+	}
+}
+
+@objc protocol AttachmentCellDelegate : NSObjectProtocol {
+	func openSelectedAttachment(collectionViewItem : NSCollectionViewItem)
+}
+
+extension Document : AttachmentCellDelegate {
+	func openSelectedAttachment(collectionViewItem: NSCollectionViewItem) {
+		
+		// get the index of this item, or bail out
+		guard let selectedIndex = self.attachmentList.indexPath(for: collectionViewItem)?.item else {
+			return
+		}
+		
+		// Get the attachment in question, or bail out
+		guard let attachment = self.attachedFiles?[selectedIndex] else {
+			return
+		}
+		
+		// First, ensure that the document is saved
+		self.autosave(withImplicitCancellability: false, completionHandler: {
+			(error) -> Void in
+			
+			var url = self.fileURL
+			url = url?.appendingPathComponent(attachment.preferredFilename!)
+			
+			if let path = url?.path {
+				NSWorkspace.shared().openFile(path, withApplication: nil, andDeactivate: true)
+			}
+		})
 	}
 }
 
