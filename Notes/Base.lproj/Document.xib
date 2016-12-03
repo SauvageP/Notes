@@ -61,14 +61,28 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Evh-6I-tJp">
+                        <rect key="frame" x="454" y="19" width="33" height="34"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="32" id="QAt-2k-Zvl"/>
+                            <constraint firstAttribute="width" constant="33" id="kGA-oq-tTx"/>
+                        </constraints>
+                        <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSAddTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dFQ-0H-PI6">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="addAttachment:" target="-2" id="uQ2-pr-p6K"/>
+                        </connections>
+                    </button>
                     <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hd9-uE-gVk">
-                        <rect key="frame" x="20" y="20" width="420" height="106"/>
+                        <rect key="frame" x="20" y="20" width="426" height="106"/>
                         <clipView key="contentView" drawsBackground="NO" id="uB5-wv-9R4">
-                            <rect key="frame" x="1" y="1" width="418" height="104"/>
+                            <rect key="frame" x="1" y="1" width="424" height="104"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <collectionView id="LYT-lj-0vL">
-                                    <rect key="frame" x="0.0" y="0.0" width="418" height="104"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="424" height="104"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="gs8-xY-uJx">
                                         <size key="itemSize" width="50" height="50"/>
@@ -93,16 +107,18 @@
                     </scrollView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="2lJ-r3-bnm" firstAttribute="leading" secondItem="hd9-uE-gVk" secondAttribute="leading" id="La6-CS-5Je"/>
-                    <constraint firstItem="hd9-uE-gVk" firstAttribute="top" secondItem="gIp-Ho-8D9" secondAttribute="top" constant="287" id="MOX-X9-hLv"/>
+                    <constraint firstItem="Evh-6I-tJp" firstAttribute="leading" secondItem="hd9-uE-gVk" secondAttribute="trailing" constant="8" symbolic="YES" id="6rA-rg-8CI"/>
+                    <constraint firstItem="2lJ-r3-bnm" firstAttribute="leading" secondItem="gIp-Ho-8D9" secondAttribute="leading" constant="20" symbolic="YES" id="6sp-So-RZV"/>
+                    <constraint firstItem="2lJ-r3-bnm" firstAttribute="centerX" secondItem="Hz6-mo-xeY" secondAttribute="centerX" id="BRe-5X-yMw"/>
+                    <constraint firstItem="2lJ-r3-bnm" firstAttribute="top" secondItem="gIp-Ho-8D9" secondAttribute="top" constant="-1" id="Gax-ex-azu"/>
+                    <constraint firstItem="2lJ-r3-bnm" firstAttribute="leading" secondItem="hd9-uE-gVk" secondAttribute="leading" id="Gg7-0y-Fdj"/>
                     <constraint firstAttribute="centerX" secondItem="Hz6-mo-xeY" secondAttribute="centerX" id="OG3-1c-Sd0"/>
-                    <constraint firstItem="2lJ-r3-bnm" firstAttribute="leading" secondItem="gIp-Ho-8D9" secondAttribute="leading" constant="20" symbolic="YES" id="PeF-SC-ime"/>
-                    <constraint firstItem="2lJ-r3-bnm" firstAttribute="top" secondItem="gIp-Ho-8D9" secondAttribute="top" constant="-1" id="R8q-vi-Pij"/>
-                    <constraint firstAttribute="bottom" secondItem="hd9-uE-gVk" secondAttribute="bottom" constant="20" symbolic="YES" id="Xbf-w0-223"/>
-                    <constraint firstAttribute="trailing" secondItem="hd9-uE-gVk" secondAttribute="trailing" constant="67" id="f6E-At-8so"/>
-                    <constraint firstItem="2lJ-r3-bnm" firstAttribute="centerX" secondItem="Hz6-mo-xeY" secondAttribute="centerX" id="kAu-C3-5s7"/>
+                    <constraint firstItem="hd9-uE-gVk" firstAttribute="bottom" secondItem="Evh-6I-tJp" secondAttribute="bottom" id="ORP-hf-7TE"/>
+                    <constraint firstItem="2lJ-r3-bnm" firstAttribute="trailing" secondItem="Evh-6I-tJp" secondAttribute="trailing" id="cwX-42-JXx"/>
+                    <constraint firstAttribute="bottom" secondItem="hd9-uE-gVk" secondAttribute="bottom" constant="20" symbolic="YES" id="iDg-iK-9rB"/>
+                    <constraint firstItem="hd9-uE-gVk" firstAttribute="top" secondItem="gIp-Ho-8D9" secondAttribute="top" constant="287" id="jBY-cM-F13"/>
+                    <constraint firstItem="hd9-uE-gVk" firstAttribute="top" secondItem="2lJ-r3-bnm" secondAttribute="bottom" constant="8" symbolic="YES" id="jL9-Vy-hf2"/>
                     <constraint firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="s6i-b7-llN"/>
-                    <constraint firstItem="hd9-uE-gVk" firstAttribute="top" secondItem="2lJ-r3-bnm" secondAttribute="bottom" constant="8" symbolic="YES" id="xeo-fT-mee"/>
                 </constraints>
             </view>
             <connections>
@@ -112,4 +128,7 @@
         </window>
         <userDefaultsController representsSharedInstance="YES" id="rKP-TT-CeN"/>
     </objects>
+    <resources>
+        <image name="NSAddTemplate" width="11" height="11"/>
+    </resources>
 </document>
