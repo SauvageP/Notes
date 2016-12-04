@@ -147,6 +147,48 @@ extension Document : NSCollectionViewDataSource {
 	}
 }
 
+extension Document : NSCollectionViewDelegate {
+	private func collectionView(_ collectionView: NSCollectionView, validateDrop draggingInfo: NSDraggingInfo, proposedIndex proposedDropIndex: AutoreleasingUnsafeMutablePointer<NSIndexPath?>, dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionViewDropOperation>) -> NSDragOperation {
+		
+		// Indicate to the user that is they release the mouse button, 
+		// it will "copy" whatever they're dragging.
+		return NSDragOperation.copy
+	}
+	
+	func collectionView(_ collectionView: NSCollectionView, acceptDrop draggingInfo: NSDraggingInfo, indexPath: IndexPath, dropOperation: NSCollectionViewDropOperation) -> Bool {
+		// Get tge pasteboard that contains the info the user dropped
+		let pasteboard = draggingInfo.draggingPasteboard()
+		
+		// If the  pasteborad contains a URL, and we can get that URL...
+		if pasteboard.types?.contains(NSURLPboardType) == true,
+			let url = NSURL(from: pasteboard) {
+			
+			// Then attempt to add that as an attachment!
+			do {
+				
+				// Add it to the document
+				try self.addAttachmentAtURL(url: url)
+				
+				// Reload the attachment list to display it
+				attachmentList.reloadData()
+				
+				// It succeeded!!
+				return true
+			} catch let error as NSError {
+				
+				// Present the error in a dialog box.
+				self.presentError(error)
+				
+				// It failed, so tell the system to animate the dropped
+				// item back to where it came from
+				return false
+			}
+		}
+		
+		return false
+	}
+}
+
 @objc protocol AttachmentCellDelegate : NSObjectProtocol {
 	func openSelectedAttachment(collectionViewItem : NSCollectionViewItem)
 }
@@ -254,6 +296,10 @@ class Document: NSDocument {
 	override init() {
 	    super.init()
 		// Add your subclass-specific initialization here.
+	}
+	
+	override func windowControllerDidLoadNib(_ windowController: NSWindowController) {
+		self.attachmentList.register(forDraggedTypes: [NSURLPboardType])
 	}
 	
 	func addAttachmentAtURL(url: NSURL) throws {
