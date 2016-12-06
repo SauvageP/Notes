@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11760" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11760"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="AttachmentCell" customModule="Notes" customModuleProvider="target">
+            <connections>
+                <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="Hz6-mo-xeY">
+            <rect key="frame" x="0.0" y="0.0" width="111" height="114"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Qjk-9O-Jsf">
+                    <rect key="frame" x="20" y="25" width="71" height="69"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="a3t-UE-JN6"/>
+                </imageView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KlV-qa-oqR">
+                    <rect key="frame" x="37" y="6" width="37" height="17"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="uhr-fR-jR4">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="Qjk-9O-Jsf" secondAttribute="trailing" constant="20" symbolic="YES" id="CGS-eH-GkA"/>
+                <constraint firstItem="KlV-qa-oqR" firstAttribute="top" secondItem="Qjk-9O-Jsf" secondAttribute="bottom" constant="2" id="QH9-Ak-5eM"/>
+                <constraint firstAttribute="bottom" secondItem="KlV-qa-oqR" secondAttribute="bottom" constant="6" id="ZpC-sA-yhl"/>
+                <constraint firstItem="Qjk-9O-Jsf" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="20" symbolic="YES" id="bud-fH-xSk"/>
+                <constraint firstItem="Qjk-9O-Jsf" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="20" symbolic="YES" id="cJ2-2S-YRa"/>
+                <constraint firstItem="Qjk-9O-Jsf" firstAttribute="centerX" secondItem="KlV-qa-oqR" secondAttribute="centerX" id="llR-T3-ZHY"/>
+            </constraints>
+            <point key="canvasLocation" x="-44.5" y="90"/>
+        </customView>
+        <collectionViewItem id="Ixa-80-R2d" customClass="AttachmentCell" customModule="Notes" customModuleProvider="target">
+            <connections>
+                <outlet property="imageView" destination="Qjk-9O-Jsf" id="BXC-V3-HE3"/>
+                <outlet property="textField" destination="KlV-qa-oqR" id="yTv-Bm-o4n"/>
+                <outlet property="view" destination="Hz6-mo-xeY" id="OHR-qj-dGs"/>
+            </connections>
+        </collectionViewItem>
+    </objects>
+</document>
