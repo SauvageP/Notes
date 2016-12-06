@@ -14,6 +14,12 @@ enum NoteDocumentFileNames : String {
 	case TextFile = "Text.rtf"
 	
 	case AttachmentsDirectory = "Attachments"
+	
+	case QuickLookDirectory = "QuickLook"
+	
+	case QuickLookTextFile = "Preview.rtf"
+	
+	case QuickLookThumbnail = "Thumbnail.png"
 
 }
 
@@ -51,12 +57,14 @@ extension FileWrapper {
 		return self.preferredFilename?.components(separatedBy: ".").last
 	}
 	dynamic var thumbnailImage : NSImage {
+		
 		if let fileExtension = self.fileExtension {
 			return NSWorkspace.shared().icon(forFileType: fileExtension)
 		} else {
 			return NSWorkspace.shared().icon(forFileType: "")
 		}
 	}
+	
 	func conformsToType(type: CFString) -> Bool {
 		// Get the extension of this file
 		guard let fileExtension = self.fileExtension else {
@@ -66,7 +74,8 @@ extension FileWrapper {
 		}
 		
 		// Get the file type of the attachment based on its extension
-		guard let filetype = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension as CFString, nil)?.takeRetainedValue() else {
+		guard let filetype = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
+		                                                           fileExtension as CFString, nil)?.takeRetainedValue() else {
 			// If we can't figure out the file type
 			// from the extension, it also doesn't conform
 			return false
@@ -127,12 +136,13 @@ extension Document : NSCollectionViewDataSource {
 		// access 'attachmentFiles', we have zero items.
 		return self.attachedFiles?.count ?? 0
 	}
+	
 	func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
 		
 		// Get the attachment that this cell should represent
 		let attachment = self.attachedFiles![indexPath.item]
 		
-		// Get the celll itself
+		// Get the cell itself
 		let item = collectionView
 		.makeItem(withIdentifier: "AttachmentCell", for: indexPath) as! AttachmentCell
 		
@@ -148,14 +158,18 @@ extension Document : NSCollectionViewDataSource {
 }
 
 extension Document : NSCollectionViewDelegate {
-	private func collectionView(_ collectionView: NSCollectionView, validateDrop draggingInfo: NSDraggingInfo, proposedIndex proposedDropIndex: AutoreleasingUnsafeMutablePointer<NSIndexPath?>, dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionViewDropOperation>) -> NSDragOperation {
+	
+	private func collectionView(_ collectionView: NSCollectionView, validateDrop draggingInfo: NSDraggingInfo,
+	                            proposedIndex proposedDropIndex: AutoreleasingUnsafeMutablePointer<NSIndexPath?>,
+	                            dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionViewDropOperation>) -> NSDragOperation {
 		
 		// Indicate to the user that is they release the mouse button, 
 		// it will "copy" whatever they're dragging.
 		return NSDragOperation.copy
 	}
 	
-	func collectionView(_ collectionView: NSCollectionView, acceptDrop draggingInfo: NSDraggingInfo, indexPath: IndexPath, dropOperation: NSCollectionViewDropOperation) -> Bool {
+	func collectionView(_ collectionView: NSCollectionView, acceptDrop draggingInfo: NSDraggingInfo,
+	                    indexPath: IndexPath, dropOperation: NSCollectionViewDropOperation) -> Bool {
 		// Get tge pasteboard that contains the info the user dropped
 		let pasteboard = draggingInfo.draggingPasteboard()
 		
@@ -263,6 +277,7 @@ class Document: NSDocument {
 			self.popover?.show(relativeTo: sender.bounds, of: sender, preferredEdge: NSRectEdge.maxY)
 		}
 	}
+	
 	@IBOutlet weak var attachmentList: NSCollectionView!
 	
 	private var attachmentsDirectoryWrapper : FileWrapper? {
@@ -316,6 +331,49 @@ class Document: NSDocument {
 		self.updateChangeCount(.changeDone)
 		self.didChangeValue(forKey: "attachedFiles")
 	}
+	
+	func iconImageDataWithSize (size: CGSize) -> NSData? {
+		
+		let image = NSImage(size: size)
+		
+		image.lockFocus()
+		
+		let entireImageRect = CGRect(origin: CGPoint.zero, size: size)
+		
+		// Fill the background with white
+		let backgroundRect = NSBezierPath(rect: entireImageRect)
+		NSColor.white.setFill()
+		backgroundRect.fill()
+		
+		if (self.attachedFiles?.count)! >= 1 {
+			
+			// Render our text, and the first attachment
+			let attachmentImage = self.attachedFiles?[0].thumbnailImage
+			let (firstHalf, secondHalf) = entireImageRect.divided(atDistance: entireImageRect.size.height / 2.0, from: CGRectEdge.minYEdge)
+
+//			CGRectDivide(entireImageRect,
+//			             &firstHalf,
+//			             &secondHalf,
+//			             entireImageRect.size.height / 2.0,
+//			             CGRectEdge.minYEdge)
+//			Unfortunately, CGRectDivide is deprecated in swift 3. Had to use the method above to get desired result.
+			
+			
+			self.text.draw(in: firstHalf)
+			attachmentImage?.draw(in: secondHalf)
+		} else {
+			// Just render our text
+			self.text.draw(in: entireImageRect)
+		}
+		
+		let bitmapRepresentation = NSBitmapImageRep(focusedViewRect: entireImageRect)
+		
+		image.unlockFocus()
+		
+		// Convert it to a PNG
+		return bitmapRepresentation?.representation(using: NSPNGFileType, properties: [:]) as NSData?
+		
+	}
 
 	override class func autosavesInPlace() -> Bool {
 		return true
@@ -349,10 +407,28 @@ class Document: NSDocument {
 			self.documentFileWrapper.removeFileWrapper(oldTextFileWrapper)
 		}
 		
+		// Create the Quicklook Folder
+		let thumbnailImageData = self.iconImageDataWithSize(size: CGSize(width: 512, height: 512))!
+		let thumbnailWrapper = FileWrapper(regularFileWithContents: thumbnailImageData as Data)
+		
+		let quicklookPreview = FileWrapper(regularFileWithContents: textRTFData)
+		let quicklookFolderFileWrapper = FileWrapper(directoryWithFileWrappers: [NoteDocumentFileNames.QuickLookTextFile.rawValue:quicklookPreview,
+		                                                                         NoteDocumentFileNames.QuickLookThumbnail.rawValue:thumbnailWrapper])
+		
+		quicklookFolderFileWrapper.preferredFilename = NoteDocumentFileNames.QuickLookDirectory.rawValue
+		
+		// Remove the old Quicklook folder if it existed
+		if let oldQuickLookFolder = self.documentFileWrapper.fileWrappers?[NoteDocumentFileNames.QuickLookDirectory.rawValue] {
+			self.documentFileWrapper.removeFileWrapper(oldQuickLookFolder)
+		}
+		
+		// Add the new Quicklook folder
+		self.documentFileWrapper.addFileWrapper(quicklookFolderFileWrapper)
+			
 		// Save the text data into the file
 		self.documentFileWrapper.addRegularFile(withContents: textRTFData, preferredFilename: NoteDocumentFileNames.TextFile.rawValue)
 		
-		// Return the main document's file wrapper - this is what will 
+		// Return the main document's file wrapper - this is what will
 		// be saved on disk
 		return self.documentFileWrapper
 	}
