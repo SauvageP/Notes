@@ -57,6 +57,15 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>NSUbiquitousContainerIsDocumentScopePublic</key>
+		<true/>
+		<key>NSUbiquitousContainerName</key>
+		<string>Notes</string>
+		<key>NSUbiquitousContainerSupportedFolderLevels</key>
+		<string>Any</string>
+	</dict>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
